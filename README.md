@@ -1,6 +1,6 @@
 # Movie Facts and Fibs (MF²): A Benchmark for Long Movie Understanding
 
-## Warning
+## Disclaimer
 
 Part of this branch were adapted for anonymization purposes. Here are the most relevant changes:
 
