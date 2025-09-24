@@ -1,5 +1,16 @@
 # Movie Facts and Fibs (MF²): A Benchmark for Long Movie Understanding
 
+## Warning
+
+Part of this branch were adapted for anonymization purposes. Here are the most relevant changes:
+
+- To run the experiments you will need to source the data from local CSV files rather than HuggingFace
+Similarly, you will have to download the raw video files by yourself.
+
+> [!WARNING]
+> Do not use this branch as a reference for forks. We will delete it once its anonymization purpose ends.
+
+
 ## Download the MF2 Dataset
 
 To download the MF2 dataset into the `data/` folder, follow these steps:
