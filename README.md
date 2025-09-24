@@ -2,7 +2,7 @@
 
 ## Disclaimer
 
-Part of this branch were adapted for anonymization purposes. Here are the most relevant changes:
+Parts of this branch were adapted for anonymization purposes. Here are the most relevant changes:
 
 - To run the experiments you will need to source the data from local CSV files rather than HuggingFace
 Similarly, you will have to download the raw video files by yourself.
