@@ -4,23 +4,19 @@
 
 Parts of this branch were adapted for anonymization purposes. Here are the most relevant changes:
 
-- To run the experiments you will need to source the data from local CSV files rather than HuggingFace
+- To run the experiments you will need to source the data from local CSV files rather than HuggingFace.
 Similarly, you will have to download the raw video files by yourself.
 
 > [!WARNING]
 > Do not use this branch as a reference for forks. We will delete it once its anonymization purpose ends.
 
 
-## Download the MF2 Dataset
+## Download the video files by yourself (only for anonymity period)
 
-To download the MF2 dataset into the `data/` folder, follow these steps:
+Put them in the data/videos folder.
 
-1. Make sure [Git LFS](https://git-lfs.github.com/) is installed. Then run:
-
-   ```bash
-   git lfs install 
-   (cd data && git clone https://huggingface.co/datasets/sardinelab/MF2)
-    ```
+> [!WARNING]
+We inform that this step is adapted for anonymization purposes. Upon acceptance huggingface will be used to download the videos automatically.
 
 ## Setup Instructions
 
@@ -130,8 +126,8 @@ python parse_model_outputs.py --output_dir <output_dir> --strategy <strategy>
 
 
 ## Contact
-For questions or support, contact [miguel.moura.ramos@tecnico.ulisboa.pt](mailto:miguel.moura.ramos@tecnico.ulisboa.pt).
-
+> [!WARNING]
+We inform that this part is adapted for anonymization purposes. Contact details will be provided upon acceptance.
 
 ## License
 CC-BY-NC-SA 4.0 license. 

@@ -11,12 +11,12 @@ MOVIE_IDS=(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 
 
 SYSTEM_PROMPT_TEMPLATE_NAME="default"
 # Base paths for videos, transcripts and synopsis
-VIDEO_BASE_PATH="data/MF2/test"
+VIDEO_BASE_PATH="data/videos" # TODO: change this to the path where you have the videos
 TRANSCRIPTS_BASE_PATH="data/transcripts"
 SYNOPSIS_BASE_PATH="data/synopsis"
 
 # path with claims files
-DATA_PATH="data/MF2/test/metadata.csv"
+DATA_PATH="data/MF2_test.csv"
 
 # Running script is based on the closed model type
 if [[ "$MODEL" == *"gemini-2.5"* ]]; then
