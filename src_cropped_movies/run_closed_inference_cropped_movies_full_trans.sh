@@ -10,7 +10,7 @@ export PYTHONPATH="/mnt/data-poseidon/manos/projects/f3-project/official_repo/MF
 MODEL_NAME="gemini-2.5-pro" #model name from registry (see models.closed_source.registry.py)
 MODEL_PROVIDER="openrouter/google/gemini-2.5-pro" #provider used.
 # MODEL_PROVIDER="openrouter/google-vertex/global/gemini-2.5-pro" #provider used.
-API_KEY=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 # open-router key
+# API_KEY=... # open-router key
 API_BASE=https://openrouter.ai/api/v1 # open-router base url
 
 # Output layout
