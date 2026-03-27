@@ -24,8 +24,6 @@ from models.internvl3_global import internvl3_inference
 from models.gemma3_global import gemma3_inference
 from models.qwenvl import qwenvl_inference
 from models.qwenvl3 import qwenvl3_inference_vllm
-from models.molmo2 import molmo2_inference_fast
-from models.phi4 import phi4_inference_fast
 
 MODELS_MAPPING = {
     # 'rhymes-ai/Aria': aria_inference, #done!
@@ -37,12 +35,10 @@ MODELS_MAPPING = {
     'glm-4.5v': inference_vllm_served_model,
 
     'Qwen/Qwen2.5-VL-72B-Instruct': qwenvl_inference,
-    'Qwen/Qwen3-VL-30B-A3B-Instruct': qwenvl3_inference_vllm, #max_frames=512,1024 frames
+    'Qwen/Qwen3-VL-30B-A3B-Instruct': qwenvl3_inference_vllm,
     'OpenGVLab/InternVL3-78B': internvl3_inference,
     'OpenGVLab/InternVL3_5-38B-Instruct': internvl3_inference,
     'google/gemma-3-27b-it': gemma3_inference,
-    'allenai/Molmo2-8B': molmo2_inference_fast,
-    'microsoft/Phi-4-multimodal-instruct': phi4_inference_fast,
     # 'KangarooGroup/kangaroo': kangaroo_inference, # done - not following the prompt
 
 

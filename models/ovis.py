@@ -3,10 +3,11 @@ from PIL import Image
 from transformers import AutoModelForCausalLM
 from moviepy.editor import VideoFileClip
 from tqdm import tqdm
+import numpy as np
 
 MAX_FRAMES=10
 
-def ovis_inference(args, input_prompts, video_path=None, system_prompt=None):
+def ovis_inference(args, input_prompts, video_path=None, system_prompt=None, shuffle_frames=False):
 
     model = AutoModelForCausalLM.from_pretrained(args.model,
                                                 torch_dtype=torch.bfloat16,
@@ -28,6 +29,8 @@ def ovis_inference(args, input_prompts, video_path=None, system_prompt=None):
                     sampled_indices = [min(total_frames - 1, int((stride * i + stride * (i + 1)) / 2)) for i in range(MAX_FRAMES)]
                 frames = [clip.get_frame(index / clip.fps) for index in sampled_indices]
                 frames = [Image.fromarray(frame, mode='RGB') for frame in frames]
+            if shuffle_frames:
+                np.random.shuffle(frames)
             images = frames
             
             prompt = '\n'.join(['<image>'] * len(images)) + '\n' + input_prompt

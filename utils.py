@@ -59,6 +59,13 @@ def validate_paths_for_mode(modality, video_path, transcripts_path, synopsis_pat
         transcripts_path = None
         synopsis_path = None
         logger.info(f"Selected mode: {modality}. Statement is only used.")
+    elif modality == "video_and_transcripts_and_audio":
+        if not video_path:
+            raise ValueError("video_path is required for video_and_transcripts_and_audio mode")
+        if not transcripts_path:
+            raise ValueError("transcripts_path is required for video_and_transcripts_and_audio mode")
+        synopsis_path = None
+        logger.info(f"Selected mode: {modality}. Video, transcripts and audio will be used.")
     else:
         raise NotImplementedError(f"Inference mode {modality} not implemented. Please construct the corresponding prompt.")
     return video_path, transcripts_path, synopsis_path
@@ -67,7 +74,6 @@ def load_transcripts(transcripts_path):
     if transcripts_path:
         logger.info(f"Loading transcripts...")
         transcripts = extract_srt_text(transcripts_path)
-        print("read transcripts!")
     else:
         transcripts = None
     return transcripts

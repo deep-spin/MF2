@@ -8,8 +8,48 @@ from torchvision.transforms.functional import InterpolationMode
 from transformers import AutoModel, AutoTokenizer, AutoConfig, AutoProcessor
 from tqdm import tqdm
 
+from loguru import logger
+
 IMAGENET_MEAN = (0.485, 0.456, 0.406)
 IMAGENET_STD = (0.229, 0.224, 0.225)
+
+# -------- Model cache --------
+_MODEL = None
+_TOKENIZER = None
+_DEVICE_MAP = None
+# -----------------------------------------------
+
+def load_internvl3_model(args):
+    global _MODEL, _TOKENIZER, _DEVICE_MAP
+
+    if _MODEL is None:
+        # _DEVICE_MAP = split_model(args.model)
+
+        _MODEL = AutoModel.from_pretrained(
+            args.model,
+            torch_dtype=torch.bfloat16,
+            use_flash_attn=True,
+            trust_remote_code=True,
+            device_map="auto"
+        ).eval()
+
+        _TOKENIZER = AutoTokenizer.from_pretrained(
+            args.model,
+            trust_remote_code=True,
+            use_fast=False
+        )
+    # device_map = split_model(args.model)
+    # model = AutoModel.from_pretrained(
+    #     args.model,
+    #     torch_dtype=torch.bfloat16,
+    #     use_flash_attn=True,
+    #     trust_remote_code=True,
+    #     device_map=device_map).eval()
+    # tokenizer = AutoTokenizer.from_pretrained(args.model, trust_remote_code=True, use_fast=False)
+    # logger.info(f"Loaded internvl3 model from {args.model}")
+
+    return _MODEL, _TOKENIZER
+
 
 def build_transform(input_size):
     MEAN, STD = IMAGENET_MEAN, IMAGENET_STD
@@ -138,16 +178,17 @@ def split_model(model_path):
 
 
 def internvl3_inference(args, input_prompts, video_path=None, system_prompt=None, shuffle_frames=False):
-    device_map = split_model(args.model)
-    model = AutoModel.from_pretrained(
-        args.model,
-        torch_dtype=torch.bfloat16,
-        use_flash_attn=True,
-        trust_remote_code=True,
-        device_map=device_map).eval()
-    tokenizer = AutoTokenizer.from_pretrained(args.model, trust_remote_code=True, use_fast=False)
+    # device_map = split_model(args.model)
+    # model = AutoModel.from_pretrained(
+    #     args.model,
+    #     torch_dtype=torch.bfloat16,
+    #     use_flash_attn=True,
+    #     trust_remote_code=True,
+    #     device_map=device_map).eval()
+    # tokenizer = AutoTokenizer.from_pretrained(args.model, trust_remote_code=True, use_fast=False)
+    model, tokenizer = load_internvl3_model(args)
     generation_config = dict[str, int](max_new_tokens=1024, do_sample=False)
-    
+
     if system_prompt:
         # Add system prompt to the model
         # TODO: Check if this is correct! it seems to be wrong (i dont see the model using the system prompt)
@@ -155,7 +196,7 @@ def internvl3_inference(args, input_prompts, video_path=None, system_prompt=None
         model.conv_template.system_prompt = system_prompt
 
     if video_path:
-        pixel_values, num_patches_list = load_video(video_path, num_segments=40, max_num=4, shuffle_frames=shuffle_frames) # max nums defines the tiles used!
+        pixel_values, num_patches_list = load_video(video_path, num_segments=20, max_num=4, shuffle_frames=shuffle_frames) # max nums defines the tiles used!
         pixel_values = pixel_values.to(torch.bfloat16).cuda()
         video_prefix = ''.join([f'Frame{i+1}: <image>\n' for i in range(len(num_patches_list))])
     else:
@@ -169,8 +210,6 @@ def internvl3_inference(args, input_prompts, video_path=None, system_prompt=None
             prompt = video_prefix + input_prompt
         else:
             prompt = input_prompt
-
         response, _ = model.chat(tokenizer, pixel_values, prompt, generation_config, num_patches_list=num_patches_list, history=None, return_history=True)
         responses.append(response)
-
     return responses

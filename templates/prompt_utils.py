@@ -1,3 +1,7 @@
+from typing import Any
+
+import random
+
 MOVIES_DICT = {
     1: {"title": "The last chance", "year": 1945},
     2: {"title": "They Made Me a Criminal", "year": 1939},
@@ -124,3 +128,90 @@ def build_prompts(claims, user_prompt_template_name, system_prompt_template_name
     return user_prompts, system_prompt
 
 
+def build_prompts_multiple_choice(claims_true, claims_false, user_prompt_template_name, system_prompt_template_name=None, video_path=None, transcripts=None, synopsis=None, movie_id=None):
+    if len(claims_true) != len(claims_false):
+        raise ValueError("Number of true claims and false claims must be the same.")
+
+    zip_claims = list(zip(claims_true, claims_false))
+    
+    #randomize the order of the claims to get rid of positional bias
+    # Shuffle each pair and track the index of the true claim
+    shuffled_claims = []
+    true_claim_indices = []
+    
+    for true_claim, false_claim in zip_claims:
+        # Create a list with both claims
+        claims_pair = [true_claim, false_claim]
+        # Shuffle the pair
+        random.shuffle(claims_pair)
+        # Find the index of the true claim after shuffling
+        true_index = claims_pair.index(true_claim)
+        shuffled_claims.append(claims_pair)
+        true_claim_indices.append(true_index)
+
+    true_claim_letters = [ 'A' if index == 0 else 'B' for index in true_claim_indices]
+    if video_path is not None and transcripts is None and synopsis is None:
+        from templates.video_only_templates import USER_PROMPTS_TEMPLATE_DICT,SYSTEM_PROMPTS_TEMPLATE_DICT
+        user_prompt = USER_PROMPTS_TEMPLATE_DICT[user_prompt_template_name]
+        user_prompts = [user_prompt.format(claim_a=claim_a, claim_b=claim_b) for claim_a, claim_b in shuffled_claims]
+        if system_prompt_template_name is not None:
+            system_prompt = SYSTEM_PROMPTS_TEMPLATE_DICT[system_prompt_template_name]
+        else:
+            system_prompt = None
+    elif video_path is not None and transcripts is not None and synopsis is None:
+        from templates.video_transcripts_templates import USER_PROMPTS_TEMPLATE_DICT,SYSTEM_PROMPTS_TEMPLATE_DICT
+        user_prompt = USER_PROMPTS_TEMPLATE_DICT[user_prompt_template_name]
+        user_prompts = [user_prompt.format(claim_a=claim_a, claim_b=claim_b, transcripts=transcripts) for claim_a, claim_b in shuffled_claims]
+        if system_prompt_template_name is not None:
+            system_prompt = SYSTEM_PROMPTS_TEMPLATE_DICT[system_prompt_template_name]
+        else:
+            system_prompt = None
+    elif video_path is not None  and synopsis is not None and transcripts is None:
+        from templates.video_synopsis_templates import USER_PROMPTS_TEMPLATE_DICT,SYSTEM_PROMPTS_TEMPLATE_DICT
+        user_prompt = USER_PROMPTS_TEMPLATE_DICT[user_prompt_template_name]
+        user_prompts = [user_prompt.format(claim_a=claim_a, claim_b=claim_b, synopsis=synopsis) for claim_a, claim_b in shuffled_claims]
+        if system_prompt_template_name is not None:
+            system_prompt = SYSTEM_PROMPTS_TEMPLATE_DICT[system_prompt_template_name]
+        else:
+            system_prompt = None
+    elif video_path is None and transcripts is not None and synopsis is not None:
+        # load templates for both transcripts and synopsis
+        from templates.video_transcripts_synopsis_templates import USER_PROMPTS_TEMPLATE_DICT,SYSTEM_PROMPTS_TEMPLATE_DICT
+        user_prompt = USER_PROMPTS_TEMPLATE_DICT[user_prompt_template_name]
+        user_prompts = [user_prompt.format(claim_a=claim_a, claim_b=claim_b, transcripts=transcripts, synopsis=synopsis) for claim_a, claim_b in shuffled_claims]
+        if system_prompt_template_name is not None:
+            system_prompt = SYSTEM_PROMPTS_TEMPLATE_DICT[system_prompt_template_name]
+        else:
+            system_prompt = None
+    elif video_path is None and transcripts is not None and synopsis is None:
+        # load templates for transcripts only
+        from templates.transcripts_only import USER_PROMPTS_TEMPLATE_DICT,SYSTEM_PROMPTS_TEMPLATE_DICT
+        user_prompt = USER_PROMPTS_TEMPLATE_DICT[user_prompt_template_name]
+        user_prompts = [user_prompt.format(claim_a=claim_a, claim_b=claim_b, transcripts=transcripts) for claim_a, claim_b in shuffled_claims]
+        if system_prompt_template_name is not None:
+            system_prompt = SYSTEM_PROMPTS_TEMPLATE_DICT[system_prompt_template_name]
+        else:
+            system_prompt = None
+    elif video_path is None and synopsis is not None and transcripts is None:
+        # load templates for synopsis only  
+        from templates.synopsis_only import USER_PROMPTS_TEMPLATE_DICT,SYSTEM_PROMPTS_TEMPLATE_DICT
+        user_prompt = USER_PROMPTS_TEMPLATE_DICT[user_prompt_template_name]
+        user_prompts = [user_prompt.format(claim_a=claim_a, claim_b=claim_b, synopsis=synopsis) for claim_a, claim_b in shuffled_claims]
+        if system_prompt_template_name is not None:
+            system_prompt = SYSTEM_PROMPTS_TEMPLATE_DICT[system_prompt_template_name]
+        else:
+            system_prompt = None
+    elif video_path is None and synopsis is  None and transcripts is None:
+        # load templates for statement only 
+        from templates.statement_only import USER_PROMPTS_TEMPLATE_DICT,SYSTEM_PROMPTS_TEMPLATE_DICT
+        user_prompt = USER_PROMPTS_TEMPLATE_DICT[user_prompt_template_name]
+        movie_title = MOVIES_DICT[movie_id]["title"]+" ("+str(MOVIES_DICT[movie_id]["year"])+")"
+        user_prompts = [user_prompt.format(claim_a=claim_a, claim_b=claim_b, movie_title=movie_title) for claim_a, claim_b in shuffled_claims]
+        if system_prompt_template_name is not None:
+            system_prompt = SYSTEM_PROMPTS_TEMPLATE_DICT[system_prompt_template_name]
+        else:
+            system_prompt = None
+        
+    else:
+        raise NotImplementedError("Not implemented yet.")
+    return user_prompts, system_prompt, true_claim_letters

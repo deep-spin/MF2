@@ -43,12 +43,46 @@ Based on the movie, is the above statement TRUE or FALSE?
 Provide only your final answer."""
 
 
+video_only_template_direct_multiple_choice = """
+You are provided with a movie and two candidate statements. 
+Your task is to carefully watch the movie and then determine which of the two statements is true.
+
+Exactly one of the statements is true, and the other is false.
+
+Statement A: {claim_a}
+Statement B: {claim_b}
+
+Question:
+Based on the movie, which statement (A or B) is TRUE?
+Provide only the letter of the true statement (A or B) as follows:
+Answer: <answer>LETTER_OF_THE_TRUE_STATEMENT_HERE</answer>
+"""
+
+video_only_template_direct_user_prompt_confidence = """
+You are provided with a movie and a statement. 
+Your task is to carefully watch the movie and then determine whether the statement is true or false.
+
+Answer TRUE if the statement is true in its entirety based on the movie.
+Answer FALSE if any part of the statement is false based on the movie.
+
+Statement: {claim}
+
+Based on the movie, is the above statement TRUE or FALSE?
+
+Provide your final answer and your confidence score (0–100), using the following XML-style tags:
+<answer>FINAL_ANSWER_HERE</answer>
+<confidence>CONFIDENCE_SCORE_HERE</confidence>
+"""
+
+
 
 USER_PROMPTS_TEMPLATE_DICT = {
     "explanation":  video_only_template_explanation_user_prompt,
     "direct": video_only_template_direct_user_prompt,
     "direct_free": video_only_template_direct_free_user_prompt,
+    "direct_confidence": video_only_template_direct_user_prompt_confidence,
     "explanation_free": video_only_template_explanation_free_user_prompt,
+    "direct_multiple_choice": video_only_template_direct_multiple_choice,
     # add more templates here if needed, e.g. model specific templates, or custom templates
     #"llavaonevision": video_template_llavaonevision_user_prompt    
 }

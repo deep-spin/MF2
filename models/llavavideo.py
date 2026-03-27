@@ -8,12 +8,14 @@ import numpy as np
 from tqdm import tqdm
 import torch
 
-def llavavideo_inference(args, input_prompts, video_path=None, system_prompt=None):
-    MAX_FRAMES=64
-    fps=1.0
-    
-    tokenizer, model, image_processor, _ = load_pretrained_model(args.model, None, "llava_qwen", torch_dtype="bfloat16", device_map="auto")
+### 7B -> 1 A6000 | 72B -> 6 A6000
+# CACHE_DIR='/mnt/scratch-artemis/miguelramos/.cache' # use my cache! model already there!
+MAX_FRAMES=64
+
+def llavavideo_inference(args, input_prompts, video_path=None, system_prompt=None,shuffle_frames=False):
+    tokenizer, model, image_processor, _ = load_pretrained_model(args.model, None, "llava_qwen", torch_dtype="bfloat16", device_map="auto", )
     model.eval()
+    fps=1.0
     if video_path:
         vr = VideoReader(video_path, ctx=cpu(0), num_threads=1)
         total_frames, video_fps = len(vr), vr.get_avg_fps()

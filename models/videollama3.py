@@ -2,7 +2,7 @@ from transformers import AutoModelForCausalLM, AutoProcessor
 from tqdm import tqdm
 import torch
 
-def videollama3_inference(args, input_prompts, video_path=None, system_prompt=None):
+def videollama3_inference(args, input_prompts, video_path=None, system_prompt=None, shuffle_frames=False):
     model = AutoModelForCausalLM.from_pretrained(
         args.model,
         trust_remote_code=True,
@@ -42,6 +42,7 @@ def videollama3_inference(args, input_prompts, video_path=None, system_prompt=No
         )
         inputs = {k: v.to(model.device) if isinstance(v, torch.Tensor) else v for k, v in inputs.items()}
         if "pixel_values" in inputs:
+            breakpoint()
             inputs["pixel_values"] = inputs["pixel_values"].to(torch.bfloat16)
 
         output_ids = model.generate(**inputs, max_new_tokens=1024,do_sample=False,temperature=0.0)
